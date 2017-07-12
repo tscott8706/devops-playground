@@ -1,1 +1,43 @@
-asdf
+version: "2"
+services:
+    jenkins:
+        image: jenkins
+        restart: always
+        ports:
+            - 8080:8080
+            - 50000:50000
+        networks:
+            devops_playground:
+                ipv4_address: 10.10.10.1
+        environment:
+            - JAVA_OPTS=-Duser.timezone=CST
+        volumes:
+            - jenkins-volume:/var/jenkins_home
+
+    git-server:
+        image: jkarlos/git-server-docker
+        restart: always
+        container_name: git-server
+        ports:
+            - "2222:22"
+        networks:
+            devops_playground:
+                ipv4_address: 10.10.10.2
+        volumes:
+            - git-server-keys:/git-server/keys
+            - git-server-repos:/git-server/repos
+
+volumes:
+    jenkins-volume:
+    git-server-keys:
+    git-server-repos:
+
+networks:
+    devops_playground:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet:  10.10.10.0/24
+                  gateway: 10.10.10.254
+
